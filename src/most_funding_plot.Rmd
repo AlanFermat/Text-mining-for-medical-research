@@ -1,0 +1,26 @@
+---
+title: "most_funding_by_state_2016_plot"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+```{r, echo=FALSE}
+library(tidyverse)
+library(ggplot2)
+sum_funding_by_state_2016_select <- read_csv("data/sum_funding_by_state_2016_select.csv")
+myLabel <- as.vector(sum_funding_by_state_2016_select$`STATE OR COUNTRY NAME`)
+myLabel = paste(myLabel, "(",round(sum_funding_by_state_2016_select$sum_funding/sum(sum_funding_by_state_2016_select$sum_funding) * 100, 2),"%)   ", sep = "")
+
+ggplot(sum_funding_by_state_2016_select)+ aes(x = "", y = proportion2, fill = `STATE OR COUNTRY NAME`) + ylab("proportion") +  geom_bar(stat = "identity", width = 1) + 
+  coord_polar(theta = "y") + ggtitle("            Top NIH Funding States In 2016   ") +
+  theme(axis.ticks = element_blank()) +
+  scale_fill_discrete(breaks =sum_funding_by_state_2016_select$`STATE OR COUNTRY NAME`, labels = myLabel) + theme(axis.text.x = element_blank(), legend.title = element_blank())  
+##From this graph, California, Massachusette, New York have obtained most funding. The reason behind this can be that these three states have high-quality education, higher population density and richer technology resources. The promise of these three states in bio-related industry is strongly supported by the graph. Other 40 states accumulate great amount of funding, meaning that while funding focused more on these ten states, other states still run projects in the bio-related research and acquire relative smaller fundings. Therefore, funding after top 10 is distributed quite evenly. 
+```
+

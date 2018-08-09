@@ -1,0 +1,55 @@
+---
+title: "city_vc_nsf"
+author: "Wei Lu"
+date: "4/13/2017"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(gridExtra)
+library(grid)
+```
+
+```{r}
+nih_city_funding_data <- read_csv("../data/nih_city_funding_data.csv", col_types = "cd")
+city_vc_health <- read.csv("../data/city_vc_health.csv",check.names="False" )
+```
+```{r}
+plot_city_nsf <- nih_city_funding_data %>% 
+  group_by(city) %>% 
+  ggplot() +
+  aes(reorder(city, funding, FUN = sum), weight = funding/1e6, fill = city)+
+  geom_bar(colour="black")+ 
+  coord_flip() +
+  theme(panel.background = element_blank()) +
+  labs(title = "", x="City",y="Total NIH Funding(million $) for the past five years",fill="City") +
+  theme(legend.position = "none") +
+  theme(axis.text=element_text(size=15))
+```
+
+```{r}
+plot_city_vc <- city_vc_health %>% 
+  ggplot() + 
+  geom_bar(colour="black",stat="identity") + aes(x=region,y=num_comps,fill=region) +
+  scale_x_discrete(limits=c('Houston',     'Los Angeles',     'Pittsburgh',     'Chicago',     'Baltimore',     'New York',     'Seattle',     'Philadelphia',     'San Diego',     'San Francisco',     'Boston')) +
+  coord_flip()  + 
+  theme(panel.background = element_blank()) +
+  theme(legend.position = "none")+
+    labs(title = "", x="",y="Number of Companies with VC investment for the past 16 years",fill="City") #change labels
+
+```
+<!-- # ```{r} -->
+<!-- # title <- textGrob("NIH funding and Number of compnies with VC investment by city over the years", gp=gpar(fontsize=13,font=8)) -->
+<!-- # grid.arrange(plot_city_nsf,plot_city_vc,ncol=2,top=title, widths=c(0.5, 0.5)) -->
+<!-- # ``` -->
+
+```{r, out.width="50%",fig.align = "default",fig.show = "hold"}
+plot_city_nsf
+plot_city_vc
+```
+
+

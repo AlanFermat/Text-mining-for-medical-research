@@ -1,0 +1,93 @@
+---
+title: "nsf_funding"
+author: "Wei Lu"
+date: "4/2/2017"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(stringr)
+```
+
+
+```{r}
+load("../data/nih_2012-2016.dat")
+disease_key_2016 <- read_csv("../data/disease_key_2016.csv", col_types = "cd")
+```
+
+```{r}
+nih_2016 <- nih %>% filter(year == 2016) %>% select(`STATE OR COUNTRY NAME`, `PROJECT TITLE`,FUNDING)
+```
+Top ten most common diseases.
+```{r}
+top_10 <- head(disease_key_2016, 10)
+```
+
+Helper function return the word if there is a match.
+```{r}
+my_match <- function(string, name_list, return_value=NA){
+  for(name in name_list){
+    if(str_detect(string,fixed(name, ignore_case=TRUE))){
+      return(name)
+    }
+  }
+  return(return_value)
+}
+```
+find each occurance of each top disease in the title
+```{r}
+nih_2016_data <- nih_2016 %>% mutate(name = map_chr(`PROJECT TITLE`, name_list=top_10$word, my_match)) %>%
+                      filter(!is.na(name))
+```
+
+```{r}
+top_10_state <- nih_2016_data %>% 
+  group_by(`STATE OR COUNTRY NAME`) %>% 
+  count() %>% 
+  arrange(desc(n)) %>% 
+  filter(rank(-n) <= 10) 
+top_10_state_data <- top_10_state %>% 
+  left_join(nih_2016_data,by = "STATE OR COUNTRY NAME")
+```
+I want to now keep the rest as "others"
+```{r}
+top_10_state_data_v2 <- nih_2016_data %>% mutate(State = map_chr(`STATE OR COUNTRY NAME`, name_list=top_10_state$`STATE OR COUNTRY NAME`, return_value="Others",  my_match)) 
+```
+```{r}
+out <- top_10_state_data_v2 %>% 
+  select(-c(`PROJECT TITLE`,`STATE OR COUNTRY NAME`))
+write_csv(out, "../data/top_10_state_disease_funding_data_v3.csv")
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

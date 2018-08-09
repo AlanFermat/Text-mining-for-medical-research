@@ -1,0 +1,66 @@
+
+```{r}
+getwd()
+load("data/funding_year.dat")
+load("data/cancer_graph.dat")
+load("data/heart_graph.dat")
+load("data/diabetes_graph.dat")
+load("data/obesity_graph.dat")
+library(ggplot2)
+library(tidyverse)
+```
+
+```{r}
+#Graph 1
+funding_year %>%
+  ggplot() +
+  geom_point(mapping = aes(x = year, y = total_funding)) + 
+  #    geom_smooth(mapping = aes(x = year, y = total_funding)) +
+  facet_wrap(~ name, nrow = 2) +
+  theme(axis.text.x = element_text(angle = 35,hjust=1)) +
+  xlab("year") + 
+  ylab("Funding Amount (million)") +
+  ggtitle("NIH Research Funding for Commmon Disease over the past 20 years")
+#ggsave("Disease_by_Year.png")
+```
+
+
+```{r}
+joint1<-full_join(cancer2,heart2,by="State_name")
+
+can <- cancer2 %>% ungroup() %>% select(State_name, total_funding, name = `Measure Name`, Rank, Value) %>% filter(name != is.na(name))
+hea <- heart2 %>% ungroup() %>% select(State_name, total_funding, name = `Measure Name`, Rank, Value) %>% filter(name != is.na(name))
+test1 <- bind_rows(can, hea)
+test1 %>% 
+  ggplot()+
+  geom_point(aes(x=total_funding,y=Value,color = name),size=2, show.legend = TRUE)+
+  ggrepel::geom_label_repel(aes(x=total_funding,y=Value,color = name, 
+                label=ifelse(Rank>40|total_funding>100000,as.character(State_name),'')),
+            size=2.5, show.legend = FALSE) +
+  scale_colour_manual(values = c(`Cancer Deaths` = "darkgreen", `Cardiovascular Deaths` = "darkorchid"))+
+  xlab("Total Funding (thousand)")+
+  ylab("Deaths per 100,000 population")+
+  ggtitle("NIH Research Funding versus Death Rates in different States")
+#ggsave("Cancer_Heart_by_State1.png")
+
+```
+
+```{r}
+joint2<-full_join(diabetes2,obesity2,by="State_name")
+
+dia <- diabetes2 %>% ungroup() %>% select(State_name, total_funding, name = `Measure Name`, Rank, Value) %>% filter(name != is.na(name))
+obe <- obesity2 %>% ungroup() %>% select(State_name, total_funding, name = `Measure Name`, Rank, Value) %>% filter(name != is.na(name))
+test <- bind_rows(dia, obe)
+test %>% 
+  ggplot()+
+  geom_point(aes(x=total_funding,y=Value,color = name),size=2, show.legend = TRUE)+
+  ggrepel::geom_label_repel(aes(x=total_funding,y=Value,color = name, 
+                label=ifelse(Rank>40|total_funding>40000,as.character(State_name),'')),
+            size=2.5, show.legend = FALSE) +
+  scale_colour_manual(values = c(Diabetes = "red", Obesity = "blue"))+
+  xlab("Total Funding (thousand)")+
+  ylab("Obesity/Diabetes Rate (%)")+
+  ggtitle("NIH Research Funding versus Disease Rates in different States")
+#ggsave("Diabetes_Obesity_by_State1.png")
+
+```

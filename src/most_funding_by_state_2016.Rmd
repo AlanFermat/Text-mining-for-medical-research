@@ -1,0 +1,47 @@
+---
+title: "most_funding_2016"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+```{r}
+library(tidyverse)
+library(dplyr)
+library(ggrepel)
+```
+
+```{r}
+getwd()
+load("../data/nih_2012-2016.dat")
+nih_2016 <- nih %>% 
+  filter(year == 2016)
+sum_funding_by_state_2016 <- group_by(nih_2016, `STATE OR COUNTRY NAME`) %>%
+  summarise(sum_funding = sum(FUNDING)) %>%
+  arrange(desc(sum_funding))
+sum_funding_by_state_2016 <- sum_funding_by_state_2016 %>%
+  mutate(proportion = sum_funding / sum(sum_funding)) 
+
+sum_funding_by_state_2016[nrow(sum_funding_by_state_2016),1] = "OTHER"
+sum_funding_by_state_2016[nrow(sum_funding_by_state_2016),2] = sum(sum_funding_by_state_2016[11:50,2])
+sum_funding_by_state_2016_select <- sum_funding_by_state_2016 %>%
+  filter(sum_funding > 700000000) %>%
+  mutate(proportion2 =  sum_funding / sum(sum_funding)) %>%
+  arrange(desc(proportion2))
+  
+  
+write_csv(sum_funding_by_state_2016_select, path = "data/sum_funding_by_state_2016_select")
+
+```
+
+
+
+
+
+

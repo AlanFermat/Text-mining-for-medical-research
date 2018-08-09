@@ -1,0 +1,43 @@
+---
+title: "NIH funding info"
+author: "Wei Lu"
+date: "4/3/2017"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+library(tidyverse)
+library(stringr)
+```
+```{r}
+data <- read_csv("../data/top_10_state_disease_funding_data_v3.csv", col_types = "dcc")
+```
+```{r}
+data %>% 
+  ggplot() +
+  aes(name, weight = FUNDING/1e6, fill=State) +
+  geom_bar() +
+  theme(legend.position = "bottom")+
+  labs(y = "Funding amount(million dollar)",
+       x = "Disease") +
+  labs(title = "Large amount of founding goes to HIV and Aging researches.")
+```
+
+```{r}
+data %>% 
+  filter(State != "Others") %>% 
+  ggplot() +
+  aes(name, weight = FUNDING, fill=State) +
+  geom_bar(position = "fill") +
+  theme(legend.position = "bottom") +
+  labs(y = "Funding propotion",
+       x = "Disease") +
+  labs(title = "Washington state is highly devoted to immune research. \n
+Unlike other states, California focuses less on diabetes compared with other disease reserach."%>%
+  stringr::str_wrap(width = 60))
+```
+
+

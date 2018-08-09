@@ -1,0 +1,19 @@
+---
+title: "showTable"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+```{r}
+require(knitr)
+require(tidyverse)
+citiesRanking <- read.csv("../data/cityRanking_table.csv")
+kable(citiesRanking[c(1:11),], caption = "A City Ranking Table")
+```
+
+

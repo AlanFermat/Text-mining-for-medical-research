@@ -1,0 +1,25 @@
+---
+title: "nih_2016_word_plot"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+```{r, echo=FALSE}
+library(NLP)
+library(tm)
+library(RColorBrewer)
+library(wordcloud)
+library(SnowballC)
+library(tidyverse)
+library(stringr)
+getwd()
+disease_key_2016 <- read_csv("../data/disease_key_2016.csv")
+wordcloud(words = disease_key_2016$word, min.freq = 1,freq = disease_key_2016$freq, rot.per=0.35,random.order=FALSE, colors=brewer.pal(8, "Dark2"))
+
+##From the graph, when we compare key words to a list of disease key words defined by CDC dictionary, words like hiv, brain, aging, disbetes, immune, lung, breast, stress occurred frequently in projects titles. This shows research project in health and biology regards these topics as the trendiest area to study. 
+```

@@ -1,0 +1,37 @@
+---
+title: "ranking"
+author: "Wei Lu"
+date: "4/13/2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+```
+
+```{r}
+ranking <- read_csv("../data/ranking_data.csv") %>% select(-c(mix, mix_1, nouse))
+```
+```{r}
+ranking <- ranking %>% 
+  gather(Schools, hospitals, physicians, NIH, VC, key = "category", value = "score")
+```
+
+```{r}
+ranking %>% 
+  filter(city == "Los Angeles") %>% 
+  ggplot() +
+  aes(category, weight = 12 - score, fill = category, 
+    width = 1) +
+  theme(axis.title.x=element_blank(),
+        axis.text.x=element_blank(),
+        axis.ticks.x=element_blank()) +
+  theme(axis.title.y=element_blank(),
+        axis.text.y=element_blank(),
+        axis.ticks.y=element_blank()) +
+  geom_bar() +
+  coord_polar() +
+  labs(title = "Los Angeles")
+```
+

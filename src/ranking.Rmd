@@ -1,0 +1,43 @@
+---
+title: "ranking"
+date: "4/13/2017"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+```
+
+```{r}
+ranking <- read_csv("../data/ranking_data.csv") 
+#%>% select(-c(mix, mix_1, nouse, rank))
+```
+
+```{r}
+ranking <- ranking %>% 
+  gather(Schools, hospitals, physicians, NIH, VC, key = "category", value = "score")
+```
+
+```{r}
+ranking %>% 
+  ggplot() +
+  aes(category, weight = 11-score, fill = category, 
+    show.legend = FALSE,
+    width = 2) +
+    geom_bar() +
+  theme(axis.title.x = element_blank(),
+        axis.title.y = element_blank(),
+        axis.ticks.x = element_blank(),
+        axis.text.x = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks.y = element_blank()) + 
+  theme(aspect.ratio = 1) + 
+  coord_polar() + 
+  facet_wrap(~city) 
+ggsave("finalRanking.png")
+```
+
+

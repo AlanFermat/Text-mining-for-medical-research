@@ -1,0 +1,66 @@
+---
+title: "largestCities"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+
+
+```{r}
+largestCity <- read.csv("../data/gistfile1.txt",col.names = c("RANK","CITY","STATE","POP","GROWTH"))
+largestCity$CITY <- tolower(largestCity$CITY)
+largestCity$STATE  <- toupper(largestCity$STATE)
+```
+
+
+```{r}
+require(tidyverse)
+load("data/nih_2012-2016.dat")
+nih_2016 <- nih %>%
+  filter(year == 2016)
+sel_nih_2016 <- nih_2016
+sel_nih_2016$CITY <- tolower(sel_nih_2016$CITY)
+sel_nih_2016 <- sel_nih_2016 %>%
+  group_by(CITY,STATE = `STATE OR COUNTRY NAME`) %>%
+  summarise(totalFunding = sum(FUNDING))
+
+```
+
+```{r}
+require(dplyr)
+cityRanking_table <- inner_join(sel_nih_2016,largestCity, by = "CITY", convert = TRUE) %>%
+  filter(STATE.x == STATE.y) %>%
+  arrange(desc(STATE.x)) %>% 
+  group_by(STATE.x) %>%
+  mutate(rank_funding = dense_rank(desc(totalFunding)),
+         rank_size =dense_rank(as.numeric(as.character(RANK)))) 
+
+
+cityRanking_table <- cityRanking_table %>%
+  select(STATE = STATE.x, CITY,pop_US = RANK,  
+         funding_state =  rank_funding, size_state =  rank_size, totalFunding) %>%
+  arrange(desc(totalFunding))
+
+cityRanking_table$funding_US <- order(desc(cityRanking_table$totalFunding))
+
+
+
+
+```
+
+```{r}
+
+write_csv(cityRanking_table, path = "data/cityRanking_table.csv")
+```
+
+
+
+
+
+
+

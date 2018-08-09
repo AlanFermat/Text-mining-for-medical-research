@@ -1,0 +1,44 @@
+---
+title: "city_nsf_data_creation"
+author: "Wei Lu"
+date: "4/13/2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+```
+```{r}
+load("../data/nih_2012-2016.dat")
+```
+```{r}
+city_list <- c('Houston',     'Los Angeles',     'Pittsburgh',     'Chicago',     'Baltimore',     'New York',     'Seattle',     'Philadelphia',     'San Diego',     'San Francisco',     'Boston', 'la jolla')
+```
+```{r}
+simpleCap <- function(x) {
+  s <- strsplit(x, " ")[[1]]
+  paste(toupper(substring(s, 1,1)), substring(s, 2),
+      sep="", collapse=" ")
+}
+change_la_jolla_to_san_diego <- function(city){
+  if(city == "la jolla"){
+    return("san diego")
+  }
+  return(city)
+}
+```
+
+```{r}
+nih_city_funding_data <- nih %>% 
+  mutate(CITY = sapply(CITY, tolower) ) %>% 
+  mutate(city = CITY, funding = FUNDING) %>% 
+  filter(CITY %in% tolower(city_list)) %>% 
+  mutate(city = map_chr(city, change_la_jolla_to_san_diego)) %>% 
+  mutate(city = sapply(city, simpleCap)) %>% select(city, funding)
+
+write_csv(nih_city_funding_data, "../data/nih_city_funding_data.csv")
+```
+
+
+
